@@ -63,7 +63,8 @@
     <div class="container">
       <div class="admin-tabs">
         <button class="admin-tab is-active" data-panel="panel-products">Productos</button>
-        <button class="admin-tab" data-panel="panel-orders">Encargos recibidos</button>
+        <button class="admin-tab" data-panel="panel-whatsapp">Consultas de WhatsApp</button>
+        <button class="admin-tab" data-panel="panel-orders">Encargos personalizados</button>
       </div>
 
       <!-- Productos -->
@@ -116,7 +117,12 @@
         </div>
       </div>
 
-      <!-- Encargos -->
+      <!-- Consultas de WhatsApp (clics en "Pedir por WhatsApp" desde el catálogo) -->
+      <div class="admin-panel" id="panel-whatsapp">
+        <div id="whatsapp-list"></div>
+      </div>
+
+      <!-- Encargos personalizados (formulario de encargo.html) -->
       <div class="admin-panel" id="panel-orders">
         <div id="order-list"></div>
       </div>
