@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacer un encargo — Ana Otalvaro Joyería</title>
+<meta name="description" content="Cuéntanos la joya que imaginas, adjunta tu diseño de referencia y te contactamos por WhatsApp.">
+<meta name="theme-color" content="#234438">
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img class="brand__mark" src="assets/logo.png" alt="Ana Otalvaro Joyería">
+      <span class="brand__text">
+        <span class="brand__name">Ana Otalvaro</span>
+        <span class="brand__tag">Joyería en plata</span>
+      </span>
+    </a>
+    <nav class="nav">
+      <div class="nav__links">
+        <a href="index.html">Inicio</a>
+        <a href="index.html#catalogo">Catálogo</a>
+        <a href="encargo.html" class="is-active">Encargos</a>
+        <a href="index.html#contacto">Contacto</a>
+        <a href="admin.html">Admin</a>
+      </div>
+      <a class="btn btn--whatsapp btn--sm nav__cta" data-wa-generic href="#">Escríbenos</a>
+      <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<section class="section" style="padding-top:56px;">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Encargos personalizados</span>
+      <h2>Cuéntanos la joya que imaginas</h2>
+      <p>Completa el formulario con los detalles de tu encargo. Si tienes una imagen de referencia o un diseño, puedes adjuntarlo. Te contactaremos por WhatsApp para coordinar todo.</p>
+    </div>
+
+    <div class="form-card" id="form-wrap">
+      <form id="encargo-form" novalidate>
+        <div class="field">
+          <label for="name">Tu nombre</label>
+          <input type="text" id="name" name="name" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="phone">Teléfono / WhatsApp</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel" placeholder="Ej: 3001234567">
+        </div>
+        <div class="field">
+          <label for="category">Tipo de joya</label>
+          <select id="category" name="category">
+            <option value="Aretes">Aretes</option>
+            <option value="Anillo">Anillo</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Describe tu encargo</label>
+          <textarea id="message" name="message" required placeholder="Cuéntanos el diseño, talla, material, ocasión, etc."></textarea>
+        </div>
+        <div class="field">
+          <label for="budget">Presupuesto aproximado (opcional)</label>
+          <input type="text" id="budget" name="budget" placeholder="Ej: $150.000 - $200.000">
+        </div>
+        <div class="field">
+          <label>Adjuntar diseño o imagen de referencia (opcional)</label>
+          <div class="file-drop" id="file-drop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            <div>Haz clic para subir una imagen</div>
+            <input type="file" id="design-file" accept="image/*">
+          </div>
+          <div class="file-preview" id="file-preview">
+            <img alt="">
+            <span class="file-preview__name"></span>
+            <button type="button" class="file-preview__remove">Quitar</button>
+          </div>
+          <p class="hint">Formatos jpg, png o webp. Máximo 8 MB.</p>
+        </div>
+
+        <button type="submit" class="btn btn--gold btn--block" id="encargo-submit">Enviar encargo</button>
+        <div class="form-msg" id="form-msg"></div>
+      </form>
+    </div>
+
+    <div class="form-card" id="success-box" style="display:none;">
+      <div class="success-box">
+        <div class="check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 13 4 4L19 7"/></svg>
+        </div>
+        <h3>¡Recibimos tu encargo!</h3>
+        <p>Da clic abajo para enviarnos un resumen por WhatsApp y así confirmar tu pedido más rápido.</p>
+        <a href="#" id="success-wa-btn" target="_blank" rel="noopener" class="btn btn--whatsapp btn--block">Continuar por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>© <span data-year></span> Ana Otalvaro Joyería. Todos los derechos reservados.</span>
+      <a href="index.html">Volver al inicio</a>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" data-wa-generic href="#" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+</a>
+
+<script type="module" src="js/site.js"></script>
+<script type="module" src="js/encargo.js"></script>
+</body>
+</html>

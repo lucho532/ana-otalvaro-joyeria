@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de administración — Ana Otalvaro Joyería</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#234438">
+<link rel="icon" href="assets/logo.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="admin-shell">
+
+  <!-- Aviso cuando Firebase no está configurado -->
+  <div id="not-configured" class="container" style="display:none;padding-top:60px;max-width:640px;">
+    <div class="form-card">
+      <h2>Falta conectar la base de datos</h2>
+      <p>Este panel necesita una cuenta de Firebase para guardar los productos, las fotos y los encargos. Sigue las instrucciones del archivo <strong>README.md</strong> del proyecto y completa <code>js/firebase-config.js</code> con tus datos.</p>
+      <a href="index.html" class="btn btn--outline">Volver al inicio</a>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div id="login-shell" class="login-shell">
+    <div class="form-card" style="width:100%;max-width:400px;">
+      <h2 style="text-align:center;">Ingreso administrador</h2>
+      <p style="text-align:center;color:var(--text-soft);">Solo Ana Otalvaro Joyería tiene acceso a esta sección.</p>
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Correo</label>
+          <input type="email" id="login-email" name="email" required autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn--primary btn--block">Ingresar</button>
+        <div class="form-msg form-msg--error" id="login-error" style="display:none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel principal -->
+  <div id="admin-shell" style="display:none;">
+    <div class="admin-topbar">
+      <div class="container">
+        <a href="index.html" class="brand">
+          <img class="brand__mark" src="assets/logo.png" alt="Ana Otalvaro Joyería">
+          <span class="brand__text">
+            <span class="brand__name" style="color:#fff;">Ana Otalvaro</span>
+            <span class="brand__tag" style="color:#f2d9a8;">Panel de administración</span>
+          </span>
+        </a>
+        <div class="top-actions">
+          <span id="admin-email" style="font-size:0.85rem;color:rgba(255,255,255,0.8);"></span>
+          <button id="logout-btn" class="btn btn--outline btn--sm">Salir</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="admin-tabs">
+        <button class="admin-tab is-active" data-panel="panel-products">Productos</button>
+        <button class="admin-tab" data-panel="panel-orders">Encargos recibidos</button>
+      </div>
+
+      <!-- Productos -->
+      <div class="admin-panel is-active" id="panel-products">
+        <div class="admin-layout">
+          <div class="card">
+            <h3 id="product-form-title">Agregar pieza nueva</h3>
+            <form id="product-form">
+              <div class="field">
+                <label for="p-name">Nombre de la pieza</label>
+                <input type="text" id="p-name" name="name" required>
+              </div>
+              <div class="field">
+                <label for="p-category">Categoría</label>
+                <select id="p-category" name="category">
+                  <option value="Aretes">Aretes</option>
+                  <option value="Anillos">Anillos</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="p-price">Precio (COP)</label>
+                <input type="number" id="p-price" name="price" min="0" required placeholder="Ej: 85000">
+              </div>
+              <div class="field">
+                <label for="p-description">Descripción</label>
+                <textarea id="p-description" name="description" required placeholder="Material, talla, detalles..."></textarea>
+              </div>
+              <div class="field">
+                <label for="product-image">Foto de la pieza</label>
+                <input type="file" id="product-image" name="image" accept="image/*">
+                <p class="hint">Deja vacío al editar si no quieres cambiar la foto.</p>
+              </div>
+              <div class="field" style="display:flex;align-items:center;gap:10px;">
+                <input type="checkbox" id="p-active" name="active" checked style="width:auto;">
+                <label for="p-active" style="margin:0;">Visible en el catálogo</label>
+              </div>
+              <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn--gold" id="product-submit">Agregar producto</button>
+                <button type="button" class="btn btn--outline" id="product-cancel-edit" style="display:none;">Cancelar</button>
+              </div>
+              <div class="form-msg" id="product-msg"></div>
+            </form>
+          </div>
+
+          <div>
+            <h3 style="margin-top:0;">Piezas publicadas</h3>
+            <div class="admin-list" id="product-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Encargos -->
+      <div class="admin-panel" id="panel-orders">
+        <div id="order-list"></div>
+      </div>
+    </div>
+    <div style="height:60px;"></div>
+  </div>
+
+</div>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

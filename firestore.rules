@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// Copia y pega estas reglas en Firebase Console:
+// Firestore Database > Reglas > pega esto > Publicar
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Catálogo de productos: cualquiera puede leerlo,
+    // solo la administradora (con sesión iniciada) puede escribir.
+    // Las fotos viajan como texto (base64) dentro del campo "imageDataUrl",
+    // así que se limita su tamaño para no llenar la base de datos.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && (!('imageDataUrl' in request.resource.data)
+                       || request.resource.data.imageDataUrl == null
+                       || request.resource.data.imageDataUrl.size() < 800000);
+    }
+
+    // Encargos: cualquier visitante puede crear uno (enviar el formulario),
+    // pero solo la administradora puede leerlos, actualizarlos o borrarlos.
+    // El diseño adjunto (si lo hay) también viaja como texto (base64) y
+    // queda limitado en tamaño para evitar abuso del formulario público.
+    match /orders/{orderId} {
+      allow create: if request.resource.data.keys().hasAll(['name', 'phone', 'message', 'status', 'createdAt'])
+                    && request.resource.data.name is string
+                    && request.resource.data.phone is string
+                    && request.resource.data.message is string
+                    && (!('designImageDataUrl' in request.resource.data)
+                        || request.resource.data.designImageDataUrl == null
+                        || request.resource.data.designImageDataUrl.size() < 700000);
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}
