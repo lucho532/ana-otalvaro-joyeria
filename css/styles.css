@@ -20,10 +20,12 @@
   --sage: #8fae95;
   --sage-dark: #4f7a5c;
   --forest: #234438;
+  --green-vivid: #7cb342;
+  --green-vivid-dark: #5a8a2c;
   --whatsapp: #25d366;
   --whatsapp-dark: #1da851;
   --danger: #c0392b;
-  --gradient-brand: linear-gradient(135deg, var(--sage-dark), var(--gold));
+  --gradient-brand: linear-gradient(135deg, var(--green-vivid), var(--gold));
   --gradient-brand-deep: linear-gradient(135deg, #2f5c47, #234438);
   --radius: 16px;
   --radius-sm: 10px;
