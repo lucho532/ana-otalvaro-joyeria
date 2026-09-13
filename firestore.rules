@@ -18,18 +18,27 @@ service cloud.firestore {
                        || request.resource.data.imageDataUrl.size() < 800000);
     }
 
-    // Encargos: cualquier visitante puede crear uno (enviar el formulario),
+    // Encargos: cualquier visitante puede crear uno, de dos formas posibles,
     // pero solo la administradora puede leerlos, actualizarlos o borrarlos.
-    // El diseño adjunto (si lo hay) también viaja como texto (base64) y
-    // queda limitado en tamaño para evitar abuso del formulario público.
     match /orders/{orderId} {
-      allow create: if request.resource.data.keys().hasAll(['name', 'phone', 'message', 'status', 'createdAt'])
-                    && request.resource.data.name is string
-                    && request.resource.data.phone is string
-                    && request.resource.data.message is string
-                    && (!('designImageDataUrl' in request.resource.data)
-                        || request.resource.data.designImageDataUrl == null
-                        || request.resource.data.designImageDataUrl.size() < 700000);
+      allow create: if (
+        // Encargo personalizado, enviado desde el formulario (con datos de contacto).
+        // El diseño adjunto (si lo hay) viaja como texto (base64) y queda
+        // limitado en tamaño para evitar abuso del formulario público.
+        (request.resource.data.keys().hasAll(['name', 'phone', 'message', 'status', 'createdAt'])
+          && request.resource.data.name is string
+          && request.resource.data.phone is string
+          && request.resource.data.message is string
+          && (!('designImageDataUrl' in request.resource.data)
+              || request.resource.data.designImageDataUrl == null
+              || request.resource.data.designImageDataUrl.size() < 700000))
+        ||
+        // Interés automático desde el catálogo: solo registra qué pieza
+        // preguntaron, sin pedirle datos de contacto al cliente.
+        (request.resource.data.keys().hasAll(['productId', 'productName', 'status', 'createdAt'])
+          && request.resource.data.productId is string
+          && request.resource.data.productName is string)
+      );
       allow read, update, delete: if request.auth != null;
     }
   }

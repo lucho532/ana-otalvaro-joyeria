@@ -401,6 +401,16 @@ p { margin: 0 0 1em; }
   border-color: rgba(169, 118, 47, 0.3);
 }
 
+.product-card--highlight {
+  animation: highlight-pulse 1.4s ease-in-out 2;
+  border-color: var(--green-vivid);
+}
+
+@keyframes highlight-pulse {
+  0%, 100% { box-shadow: var(--shadow); }
+  50% { box-shadow: 0 0 0 8px rgba(26, 158, 132, 0.25), var(--shadow-lg); }
+}
+
 .product-card__img {
   aspect-ratio: 1 / 1;
   background: var(--bg-soft);

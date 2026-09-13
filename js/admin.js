@@ -26,6 +26,7 @@ let fb = null;
 let editingProductId = null;
 let unsubProducts = null;
 let unsubOrders = null;
+let latestProducts = [];
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -112,6 +113,7 @@ function watchProducts() {
   const q = firestore.query(firestore.collection(db, "products"), firestore.orderBy("createdAt", "desc"));
   unsubProducts = firestore.onSnapshot(q, (snap) => {
     const products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    latestProducts = products;
     renderProducts(products);
   });
 }
@@ -284,6 +286,10 @@ function watchOrders() {
   });
 }
 
+function productUrl(productId) {
+  return `${window.location.origin}/index.html?producto=${encodeURIComponent(productId)}#catalogo`;
+}
+
 function renderOrders(orders) {
   if (orders.length === 0) {
     orderList.innerHTML = `<p class="empty-hint">Todavía no han llegado encargos por la página.</p>`;
@@ -292,22 +298,40 @@ function renderOrders(orders) {
 
   orderList.innerHTML = orders
     .map((o) => {
-      const phoneDigits = (o.phone || "").replace(/\D/g, "");
-      const waMsg = encodeURIComponent(`Hola ${o.name}, te escribimos de Ana Otalvaro Joyería sobre tu encargo ✨`);
+      const isCatalogOrder = Boolean(o.productId);
+      const product = isCatalogOrder ? latestProducts.find((p) => p.id === o.productId) : null;
+
+      const productBlock = isCatalogOrder
+        ? `
+          <div style="display:flex;gap:12px;align-items:center;margin:14px 0;padding:10px;background:var(--bg-soft);border-radius:10px;">
+            <img src="${escapeHtml((product && product.imageDataUrl) || "")}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:8px;background:var(--surface-alt);flex:none;">
+            <div style="min-width:0;">
+              <div style="font-weight:600;">${escapeHtml(o.productName || (product && product.name) || "Producto eliminado")}</div>
+              <div class="admin-row__meta">${formatPrice(o.productPrice)}</div>
+              <a href="${productUrl(o.productId)}" target="_blank" rel="noopener" style="font-size:0.8rem;color:var(--gold-dark);">Ver producto en la página →</a>
+            </div>
+          </div>`
+        : "";
+
+      const contactBlock = isCatalogOrder
+        ? `<p style="margin:10px 0 0;font-size:0.85rem;color:var(--text-soft);">Sin datos de contacto todavía: cuando esta persona te escriba por WhatsApp, verás su número directamente en tu chat.</p>`
+        : `<a class="btn btn--whatsapp btn--sm" target="_blank" rel="noopener" href="https://wa.me/${(o.phone || "").replace(/\D/g, "")}?text=${encodeURIComponent(`Hola ${o.name}, te escribimos de Ana Otalvaro Joyería sobre tu pedido ✨`)}">Responder por WhatsApp</a>`;
+
       return `
       <div class="card" style="margin-bottom:14px;">
         <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;">
           <div>
-            <h4 style="margin:0 0 4px;">${escapeHtml(o.name)} · <span class="badge">${escapeHtml(o.category || "")}</span></h4>
-            <div class="admin-row__meta">${escapeHtml(o.phone || "")} · ${formatDate(o.createdAt)}</div>
+            <h4 style="margin:0 0 4px;">${isCatalogOrder ? "Consulta desde el catálogo" : escapeHtml(o.name)} · <span class="badge">${isCatalogOrder ? "Pedido de catálogo" : escapeHtml(o.category || "Encargo")}</span></h4>
+            <div class="admin-row__meta">${escapeHtml(o.phone || "")}${o.phone ? " · " : ""}${formatDate(o.createdAt)}</div>
           </div>
           <span class="badge ${o.status === "atendido" ? "badge--done" : "badge--new"}">${o.status === "atendido" ? "Atendido" : "Nuevo"}</span>
         </div>
-        <p style="margin:14px 0;">${escapeHtml(o.message)}</p>
+        ${!isCatalogOrder ? `<p style="margin:14px 0;">${escapeHtml(o.message)}</p>` : ""}
         ${o.budget ? `<p style="margin:0 0 10px;font-size:0.88rem;color:var(--text-soft);">Presupuesto: ${escapeHtml(o.budget)}</p>` : ""}
         ${o.designImageDataUrl ? `<a href="${escapeHtml(o.designImageDataUrl)}" target="_blank" rel="noopener"><img src="${escapeHtml(o.designImageDataUrl)}" alt="Diseño adjunto" style="width:110px;height:110px;object-fit:cover;border-radius:10px;margin-bottom:14px;"></a>` : ""}
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <a class="btn btn--whatsapp btn--sm" target="_blank" rel="noopener" href="https://wa.me/${phoneDigits}?text=${waMsg}">Responder por WhatsApp</a>
+        ${productBlock}
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          ${contactBlock}
           <button class="btn btn--outline btn--sm" data-order-toggle="${o.id}" data-status="${o.status || "nuevo"}">
             Marcar como ${o.status === "atendido" ? "nuevo" : "atendido"}
           </button>
