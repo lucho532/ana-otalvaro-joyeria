@@ -244,7 +244,7 @@ productForm?.addEventListener("submit", async (e) => {
     let imageDataUrl;
 
     if (file) {
-      imageDataUrl = await compressImageToDataUrl(file, { maxDim: 1100, maxBytes: 550 * 1024 });
+      imageDataUrl = await compressImageToDataUrl(file, { maxDim: 560, maxBytes: 45 * 1024 });
     }
 
     if (editingProductId) {
