@@ -42,6 +42,7 @@ function escapeHtml(str) {
 }
 
 function formatPrice(value) {
+  if (value === null || value === undefined || value === "") return "";
   const n = Number(value);
   if (Number.isNaN(n)) return "";
   return n.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
@@ -262,13 +263,14 @@ productForm?.addEventListener("submit", async (e) => {
 
   const name = productForm.name.value.trim();
   const category = productForm.category.value;
-  const price = Number(productForm.price.value);
+  const priceRaw = productForm.price.value.trim();
+  const price = priceRaw === "" ? null : Number(priceRaw);
   const description = productForm.description.value.trim();
   const active = productForm.active.checked;
   const file = productImageInput.files[0];
 
-  if (!name || !description || !price) {
-    productMsg.textContent = "Completa nombre, precio y descripción.";
+  if (!name || !description) {
+    productMsg.textContent = "Completa nombre y descripción.";
     productMsg.className = "form-msg is-visible form-msg--error";
     return;
   }

@@ -18,6 +18,7 @@ function escapeHtml(str) {
 }
 
 function formatPrice(value) {
+  if (value === null || value === undefined || value === "") return "";
   const n = Number(value);
   if (Number.isNaN(n)) return "";
   return n.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
@@ -28,7 +29,9 @@ function productUrl(product) {
 }
 
 function waLink(product) {
-  const msg = `Hola ✨ Me interesa esta pieza: "${product.name}" (${formatPrice(product.price)}).\n${productUrl(product)}\n¿Sigue disponible?`;
+  const priceLabel = formatPrice(product.price);
+  const pieza = `"${product.name}"${priceLabel ? ` (${priceLabel})` : ""}`;
+  const msg = `Hola ✨ Me interesa esta pieza: ${pieza}.\n${productUrl(product)}\n¿Sigue disponible?`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 }
 
