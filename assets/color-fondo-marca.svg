@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
+  <rect width="600" height="400" fill="#1a9e84"/>
+  <rect x="24" y="24" width="300" height="110" rx="12" fill="#ffffff" fill-opacity="0.92"/>
+  <text x="44" y="62" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1a1a1a">Verde de marca</text>
+  <text x="44" y="92" font-family="Arial, sans-serif" font-size="20" fill="#1a1a1a">HEX #1A9E84</text>
+  <text x="44" y="118" font-family="Arial, sans-serif" font-size="18" fill="#444444">RGB 26, 158, 132</text>
+</svg>
