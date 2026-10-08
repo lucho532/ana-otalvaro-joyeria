@@ -743,6 +743,7 @@ p { margin: 0 0 1em; }
 }
 .admin-topbar .container {
   display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
 }
 .admin-topbar .btn--outline {
   background: rgba(255,255,255,0.12);
@@ -778,6 +779,7 @@ p { margin: 0 0 1em; }
   gap: 30px;
   align-items: start;
 }
+.admin-layout > * { min-width: 0; }
 @media (max-width: 900px) { .admin-layout { grid-template-columns: 1fr; } }
 
 .card {
@@ -868,7 +870,12 @@ p { margin: 0 0 1em; }
   color: var(--text-soft);
 }
 
-.top-actions { display: flex; gap: 10px; align-items: center; }
+.top-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+@media (max-width: 480px) {
+  #admin-email { display: none; }
+  .top-actions { width: 100%; justify-content: flex-end; }
+}
 
 .spinner {
   width: 18px; height: 18px; border-radius: 50%;
