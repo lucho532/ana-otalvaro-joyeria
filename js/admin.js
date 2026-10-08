@@ -9,6 +9,10 @@ const loginShell = document.getElementById("login-shell");
 const adminShell = document.getElementById("admin-shell");
 const loginForm = document.getElementById("login-form");
 const loginError = document.getElementById("login-error");
+const loginPasswordInput = document.getElementById("login-password");
+const loginPasswordToggle = document.getElementById("login-password-toggle");
+const forgotPasswordBtn = document.getElementById("forgot-password-btn");
+const forgotPasswordMsg = document.getElementById("forgot-password-msg");
 const logoutBtn = document.getElementById("logout-btn");
 const adminEmailLabel = document.getElementById("admin-email");
 
@@ -98,6 +102,32 @@ logoutBtn?.addEventListener("click", async () => {
   await authMod.signOut(auth);
 });
 
+loginPasswordToggle?.addEventListener("click", () => {
+  const showing = loginPasswordInput.type === "text";
+  loginPasswordInput.type = showing ? "password" : "text";
+  loginPasswordToggle.querySelector(".eye-open").style.display = showing ? "block" : "none";
+  loginPasswordToggle.querySelector(".eye-closed").style.display = showing ? "none" : "block";
+});
+
+forgotPasswordBtn?.addEventListener("click", async () => {
+  const email = loginForm.email.value.trim();
+  forgotPasswordMsg.style.display = "block";
+  if (!email) {
+    forgotPasswordMsg.textContent = "Escribe primero tu correo arriba y luego toca este enlace.";
+    forgotPasswordMsg.className = "form-msg is-visible form-msg--error";
+    return;
+  }
+  try {
+    const { auth, authMod } = fb;
+    await authMod.sendPasswordResetEmail(auth, email);
+    forgotPasswordMsg.textContent = "Listo, revisa tu correo: te enviamos un enlace para crear una nueva contraseña.";
+    forgotPasswordMsg.className = "form-msg is-visible";
+  } catch (err) {
+    forgotPasswordMsg.textContent = "No pudimos enviar el correo. Verifica que esté bien escrito.";
+    forgotPasswordMsg.className = "form-msg is-visible form-msg--error";
+  }
+});
+
 // -------------------- Pestañas --------------------
 
 document.querySelectorAll(".admin-tab").forEach((tab) => {
@@ -138,14 +168,17 @@ function renderProducts(products) {
           </div>
         </div>
         <div class="admin-row__actions">
-          <button class="icon-btn" title="Editar" data-edit="${p.id}">
+          <button class="icon-btn icon-btn--label" title="Editar" data-edit="${p.id}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Editar
           </button>
-          <button class="icon-btn" title="${p.active ? "Ocultar" : "Mostrar"}" data-toggle="${p.id}" data-active="${p.active}">
+          <button class="icon-btn icon-btn--label" title="${p.active ? "Ocultar" : "Mostrar"}" data-toggle="${p.id}" data-active="${p.active}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            ${p.active ? "Ocultar" : "Mostrar"}
           </button>
-          <button class="icon-btn icon-btn--danger" title="Eliminar" data-delete="${p.id}">
+          <button class="icon-btn icon-btn--label icon-btn--danger" title="Eliminar" data-delete="${p.id}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
+            Eliminar
           </button>
         </div>
       </div>`

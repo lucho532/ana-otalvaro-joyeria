@@ -807,7 +807,7 @@ p { margin: 0 0 1em; }
 .admin-row__body { flex: 1; min-width: 0; }
 .admin-row__body h4 { margin: 0 0 3px; font-size: 0.98rem; }
 .admin-row__meta { font-size: 0.8rem; color: var(--text-soft); }
-.admin-row__actions { display: flex; gap: 8px; flex: none; }
+.admin-row__actions { display: flex; gap: 8px; flex: none; flex-wrap: wrap; }
 .icon-btn {
   width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border-strong);
   background: #fff; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -815,6 +815,29 @@ p { margin: 0 0 1em; }
 .icon-btn:hover { background: var(--surface-alt); }
 .icon-btn svg { width: 15px; height: 15px; }
 .icon-btn--danger { color: var(--danger); }
+.icon-btn--label {
+  width: auto; height: auto; border-radius: 999px; padding: 7px 14px; gap: 6px;
+  font-size: 0.82rem; font-weight: 600; white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .admin-row { flex-wrap: wrap; }
+  .admin-row__actions { width: 100%; }
+}
+
+.password-field { position: relative; }
+.password-field input { padding-right: 42px; }
+.password-toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border: none; background: transparent; cursor: pointer;
+  color: var(--text-soft); display: flex; align-items: center; justify-content: center;
+}
+.password-toggle svg { width: 18px; height: 18px; }
+
+.link-btn {
+  border: none; background: none; color: var(--gold-dark); font-size: 0.85rem;
+  cursor: pointer; text-decoration: underline; padding: 0;
+}
 
 .badge {
   display: inline-block;

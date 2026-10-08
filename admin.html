@@ -34,10 +34,20 @@
         </div>
         <div class="field">
           <label for="login-password">Contraseña</label>
-          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+          <div class="password-field">
+            <input type="password" id="login-password" name="password" required autocomplete="current-password">
+            <button type="button" class="password-toggle" id="login-password-toggle" aria-label="Mostrar contraseña">
+              <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-7-11-7a20.3 20.3 0 0 1 4.22-5.06M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a20.3 20.3 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>
+            </button>
+          </div>
         </div>
         <button type="submit" class="btn btn--primary btn--block">Ingresar</button>
         <div class="form-msg form-msg--error" id="login-error" style="display:none;"></div>
+        <div style="text-align:center;margin-top:14px;">
+          <button type="button" id="forgot-password-btn" class="link-btn">¿Olvidaste tu contraseña?</button>
+        </div>
+        <div class="form-msg" id="forgot-password-msg" style="display:none;"></div>
       </form>
     </div>
   </div>
