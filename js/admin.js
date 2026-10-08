@@ -18,6 +18,7 @@ const adminEmailLabel = document.getElementById("admin-email");
 
 const productForm = document.getElementById("product-form");
 const productList = document.getElementById("product-list");
+const productFilter = document.getElementById("product-filter");
 const productFormTitle = document.getElementById("product-form-title");
 const productSubmitBtn = document.getElementById("product-submit");
 const productCancelEditBtn = document.getElementById("product-cancel-edit");
@@ -32,6 +33,7 @@ let editingProductId = null;
 let unsubProducts = null;
 let unsubOrders = null;
 let latestProducts = [];
+let productCategoryFilter = "todos";
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -145,13 +147,26 @@ function watchProducts() {
   unsubProducts = firestore.onSnapshot(q, (snap) => {
     const products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     latestProducts = products;
-    renderProducts(products);
+    renderProducts(filterProducts(products));
   });
 }
 
+function filterProducts(products) {
+  if (productCategoryFilter === "todos") return products;
+  return products.filter((p) => p.category === productCategoryFilter);
+}
+
+productFilter?.addEventListener("change", () => {
+  productCategoryFilter = productFilter.value;
+  renderProducts(filterProducts(latestProducts));
+});
+
 function renderProducts(products) {
   if (products.length === 0) {
-    productList.innerHTML = `<p class="empty-hint">Todavía no has agregado piezas. Usa el formulario para subir la primera 💍</p>`;
+    productList.innerHTML =
+      productCategoryFilter === "todos"
+        ? `<p class="empty-hint">Todavía no has agregado piezas. Usa el formulario para subir la primera 💍</p>`
+        : `<p class="empty-hint">No hay piezas en "${escapeHtml(productCategoryFilter)}" todavía.</p>`;
     return;
   }
 
