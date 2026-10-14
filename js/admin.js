@@ -175,7 +175,15 @@ function renderProducts(products) {
     .map(
       (p) => `
       <div class="admin-row">
-        <img src="${escapeHtml(p.imageDataUrl || "")}" alt="">
+        <img
+          class="admin-product-image"
+          src="${escapeHtml(p.imageDataUrl || "")}"
+          alt="Ver fotografía ampliada de ${escapeHtml(p.name)}"
+          title="Pulsa para ampliar la fotografía"
+          role="button"
+          tabindex="0"
+          data-preview-image="${escapeHtml(p.id)}"
+        >
         <div class="admin-row__body">
           <h4>${escapeHtml(p.name)}</h4>
           <div class="admin-row__meta">
@@ -200,6 +208,91 @@ function renderProducts(products) {
       </div>`
     )
     .join("");
+
+
+      // Ampliar fotografías al hacer clic o pulsar Enter/Espacio.
+  productList.querySelectorAll("[data-preview-image]").forEach((img) => {
+    const abrirImagen = () => {
+      const producto = products.find(
+        (p) => p.id === img.dataset.previewImage
+      );
+
+      if (!producto?.imageDataUrl) {
+        alert("Este producto no tiene una fotografía disponible.");
+        return;
+      }
+
+      let modal = document.getElementById("admin-image-modal");
+
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "admin-image-modal";
+        modal.className = "admin-image-modal";        
+        modal.style.cssText = `
+          position: fixed !important;
+          inset: 0 !important;
+          z-index: 999999 !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          box-sizing: border-box;
+          background: rgba(0, 0, 0, 0.85);
+        `;
+
+        modal.innerHTML = `
+          <div class="admin-image-modal__content"
+               role="dialog"
+               aria-modal="true"
+               aria-label="Fotografía del producto">
+            <button type="button"
+                    class="admin-image-modal__close"
+                    aria-label="Cerrar fotografía">&times;</button>
+            <img class="admin-image-modal__photo" alt="">
+            <p class="admin-image-modal__caption"></p>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+  
+        modal.addEventListener("click", (event) => {
+          const botonCerrar = event.target.closest(".admin-image-modal__close");
+
+          if (event.target === modal || botonCerrar) {
+            modal.hidden = true;
+            modal.style.display = "none";
+          }
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && !modal.hidden) {
+            modal.hidden = true;
+            modal.style.display = "none";
+          }
+        });
+      }
+
+      modal.querySelector(".admin-image-modal__photo").src =
+        producto.imageDataUrl;
+
+      modal.querySelector(".admin-image-modal__caption").textContent =
+        producto.name || "Fotografía del producto";
+
+      modal.hidden = false;
+      modal.style.display = "flex";
+    };
+
+    img.addEventListener("click", abrirImagen);
+
+    img.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        abrirImagen();
+      }
+    });
+  });
+      
 
   productList.querySelectorAll("[data-edit]").forEach((btn) => {
     btn.addEventListener("click", () => {

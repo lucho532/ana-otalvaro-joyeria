@@ -888,3 +888,76 @@ p { margin: 0 0 1em; }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0);
 }
+
+
+/* Fotografías ampliadas en el administrador */
+.admin-product-image {
+  cursor: zoom-in;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.admin-product-image:hover {
+  transform: scale(1.04);
+}
+
+
+/* Modal para ampliar fotografías del administrador */
+#admin-image-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+#admin-image-modal[hidden] {
+  display: none !important;
+}
+
+#admin-image-modal .admin-image-modal__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 95vw;
+  max-height: 95vh;
+}
+
+#admin-image-modal .admin-image-modal__photo {
+  display: block;
+  max-width: 90vw;
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+}
+
+#admin-image-modal .admin-image-modal__caption {
+  margin: 0;
+  color: #fff;
+  text-align: center;
+}
+
+#admin-image-modal .admin-image-modal__close {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #222;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
