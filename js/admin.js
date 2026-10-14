@@ -45,7 +45,11 @@ function formatPrice(value) {
   if (value === null || value === undefined || value === "") return "";
   const n = Number(value);
   if (Number.isNaN(n)) return "";
-  return n.toLocaleString("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
+  return n.toLocaleString("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
 }
 
 function formatDate(ts) {
@@ -108,25 +112,32 @@ logoutBtn?.addEventListener("click", async () => {
 loginPasswordToggle?.addEventListener("click", () => {
   const showing = loginPasswordInput.type === "text";
   loginPasswordInput.type = showing ? "password" : "text";
-  loginPasswordToggle.querySelector(".eye-open").style.display = showing ? "block" : "none";
-  loginPasswordToggle.querySelector(".eye-closed").style.display = showing ? "none" : "block";
+  loginPasswordToggle.querySelector(".eye-open").style.display = showing
+    ? "block"
+    : "none";
+  loginPasswordToggle.querySelector(".eye-closed").style.display = showing
+    ? "none"
+    : "block";
 });
 
 forgotPasswordBtn?.addEventListener("click", async () => {
   const email = loginForm.email.value.trim();
   forgotPasswordMsg.style.display = "block";
   if (!email) {
-    forgotPasswordMsg.textContent = "Escribe primero tu correo arriba y luego toca este enlace.";
+    forgotPasswordMsg.textContent =
+      "Escribe primero tu correo arriba y luego toca este enlace.";
     forgotPasswordMsg.className = "form-msg is-visible form-msg--error";
     return;
   }
   try {
     const { auth, authMod } = fb;
     await authMod.sendPasswordResetEmail(auth, email);
-    forgotPasswordMsg.textContent = "Listo, revisa tu correo: te enviamos un enlace para crear una nueva contraseña.";
+    forgotPasswordMsg.textContent =
+      "Listo, revisa tu correo: te enviamos un enlace para crear una nueva contraseña.";
     forgotPasswordMsg.className = "form-msg is-visible";
   } catch (err) {
-    forgotPasswordMsg.textContent = "No pudimos enviar el correo. Verifica que esté bien escrito.";
+    forgotPasswordMsg.textContent =
+      "No pudimos enviar el correo. Verifica que esté bien escrito.";
     forgotPasswordMsg.className = "form-msg is-visible form-msg--error";
   }
 });
@@ -135,8 +146,14 @@ forgotPasswordBtn?.addEventListener("click", async () => {
 
 document.querySelectorAll(".admin-tab").forEach((tab) => {
   tab.addEventListener("click", () => {
-    document.querySelectorAll(".admin-tab").forEach((t) => t.classList.toggle("is-active", t === tab));
-    document.querySelectorAll(".admin-panel").forEach((p) => p.classList.toggle("is-active", p.id === tab.dataset.panel));
+    document
+      .querySelectorAll(".admin-tab")
+      .forEach((t) => t.classList.toggle("is-active", t === tab));
+    document
+      .querySelectorAll(".admin-panel")
+      .forEach((p) =>
+        p.classList.toggle("is-active", p.id === tab.dataset.panel),
+      );
   });
 });
 
@@ -144,7 +161,10 @@ document.querySelectorAll(".admin-tab").forEach((tab) => {
 
 function watchProducts() {
   const { db, firestore } = fb;
-  const q = firestore.query(firestore.collection(db, "products"), firestore.orderBy("createdAt", "desc"));
+  const q = firestore.query(
+    firestore.collection(db, "products"),
+    firestore.orderBy("createdAt", "desc"),
+  );
   unsubProducts = firestore.onSnapshot(q, (snap) => {
     const products = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     latestProducts = products;
@@ -205,17 +225,14 @@ function renderProducts(products) {
             Eliminar
           </button>
         </div>
-      </div>`
+      </div>`,
     )
     .join("");
 
-
-      // Ampliar fotografías al hacer clic o pulsar Enter/Espacio.
+  // Ampliar fotografías al hacer clic o pulsar Enter/Espacio.
   productList.querySelectorAll("[data-preview-image]").forEach((img) => {
     const abrirImagen = () => {
-      const producto = products.find(
-        (p) => p.id === img.dataset.previewImage
-      );
+      const producto = products.find((p) => p.id === img.dataset.previewImage);
 
       if (!producto?.imageDataUrl) {
         alert("Este producto no tiene una fotografía disponible.");
@@ -227,7 +244,7 @@ function renderProducts(products) {
       if (!modal) {
         modal = document.createElement("div");
         modal.id = "admin-image-modal";
-        modal.className = "admin-image-modal";        
+        modal.className = "admin-image-modal";
         modal.style.cssText = `
           position: fixed !important;
           inset: 0 !important;
@@ -255,7 +272,6 @@ function renderProducts(products) {
 
         document.body.appendChild(modal);
 
-  
         modal.addEventListener("click", (event) => {
           const botonCerrar = event.target.closest(".admin-image-modal__close");
 
@@ -292,25 +308,165 @@ function renderProducts(products) {
       }
     });
   });
-      
 
   productList.querySelectorAll("[data-edit]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const p = products.find((x) => x.id === btn.dataset.edit);
-      startEditProduct(p);
+      if (!p) return;
+
+      const tarjeta = btn.closest(".admin-row");
+      const formularioAbierto = tarjeta.querySelector(".admin-inline-edit");
+
+      // Si ya está abierto, lo cerramos.
+      if (formularioAbierto) {
+        formularioAbierto.remove();
+        tarjeta.classList.remove("admin-row--editing");
+        return;
+      }
+
+      // Cerramos cualquier otro formulario abierto.
+      productList.querySelectorAll(".admin-inline-edit").forEach((form) => {
+        form.remove();
+      });
+      productList.querySelectorAll(".admin-row--editing").forEach((row) => {
+        row.classList.remove("admin-row--editing");
+      });
+
+      tarjeta.classList.add("admin-row--editing");
+
+      const formulario = document.createElement("form");
+      formulario.className = "admin-inline-edit";
+
+      formulario.innerHTML = `
+  <h4>Editar pieza</h4>
+
+  <label>
+    Nombre
+    <input name="name" type="text" required value="${escapeHtml(p.name || "")}">
+  </label>
+
+  <label>
+    Categoría
+    <select name="category" required>
+      ${["Aretes", "Anillos", "Collares", "Pulseras", "Dijes", "Otros"]
+        .map(
+          (categoria) => `
+          <option value="${categoria}" ${p.category === categoria ? "selected" : ""}>
+            ${categoria}
+          </option>
+        `,
+        )
+        .join("")}
+    </select>
+  </label>
+
+  <label>
+    Precio
+    <input name="price" type="number" min="0" step="any"
+      value="${p.price ?? ""}">
+  </label>
+
+  <label>
+    Descripción
+    <textarea name="description" required>${escapeHtml(p.description || "")}</textarea>
+  </label>
+
+  <label>
+    <input name="active" type="checkbox" ${p.active !== false ? "checked" : ""}>
+    Producto visible
+  </label>
+
+  <label>
+    Cambiar fotografía (opcional)
+    <input name="image" type="file" accept="image/*">
+  </label>
+
+  <p class="inline-edit-message" role="status"></p>
+
+  <div class="admin-row__actions">
+    <button type="submit" class="icon-btn icon-btn--label">Guardar cambios</button>
+    <button type="button" class="icon-btn icon-btn--label" data-cancel-inline>Cancelar</button>
+  </div>
+`;
+
+      tarjeta.appendChild(formulario);
+
+      formulario.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const botonGuardar = formulario.querySelector('[type="submit"]');
+        const mensaje = formulario.querySelector(".inline-edit-message");
+        const archivo = formulario.elements.image.files[0];
+
+        if (archivo && archivo.size > 15 * 1024 * 1024) {
+          mensaje.textContent = "La fotografía no puede superar los 15 MB.";
+          return;
+        }
+
+        botonGuardar.disabled = true;
+        mensaje.textContent = "Guardando cambios...";
+
+        try {
+          const nombre = formulario.elements.name.value.trim();
+          const descripcion = formulario.elements.description.value.trim();
+          const precioTexto = formulario.elements.price.value.trim();
+
+          if (!nombre || !descripcion) {
+            throw new Error("El nombre y la descripción son obligatorios.");
+          }
+
+          const datos = {
+            name: nombre,
+            category: formulario.elements.category.value,
+            price: precioTexto === "" ? null : Number(precioTexto),
+            description: descripcion,
+            active: formulario.elements.active.checked,
+          };
+
+          if (archivo) {
+            datos.imageDataUrl = await compressImageToDataUrl(archivo, {
+              maxDim: 560,
+              maxBytes: 45 * 1024,
+            });
+          }
+
+          const { db, firestore } = fb;
+
+          await firestore.updateDoc(firestore.doc(db, "products", p.id), datos);
+
+          mensaje.textContent = "¡Cambios guardados!";
+        } catch (error) {
+          console.error(error);
+          mensaje.textContent =
+            error.message || "No se pudieron guardar los cambios.";
+        } finally {
+          botonGuardar.disabled = false;
+        }
+      });
+
+      formulario
+        .querySelector("[data-cancel-inline]")
+        .addEventListener("click", () => {
+          formulario.remove();
+          tarjeta.classList.remove("admin-row--editing");
+        });
+
+      formulario.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   });
 
   productList.querySelectorAll("[data-toggle]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const { db, firestore } = fb;
-      await firestore.updateDoc(firestore.doc(db, "products", btn.dataset.toggle), {
-        active: btn.dataset.active !== "true",
-      });
+      await firestore.updateDoc(
+        firestore.doc(db, "products", btn.dataset.toggle),
+        {
+          active: btn.dataset.active !== "true",
+        },
+      );
     });
   });
 
-  
   productList.querySelectorAll("[data-delete]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       if (!confirm("¿Eliminar esta pieza? Esta acción no se puede deshacer.")) {
@@ -329,9 +485,7 @@ function renderProducts(products) {
       btn.disabled = true;
 
       try {
-        await firestore.deleteDoc(
-          firestore.doc(db, "products", p.id)
-        );
+        await firestore.deleteDoc(firestore.doc(db, "products", p.id));
 
         console.info("Producto eliminado correctamente:", p.id);
         alert("La pieza se ha eliminado correctamente.");
@@ -339,10 +493,12 @@ function renderProducts(products) {
         console.error("Error al eliminar el producto:", err);
 
         const mensajes = {
-          "permission-denied": "Firebase ha rechazado la operación por permisos.",
-          "unauthenticated": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
-          "unavailable": "Firebase no está disponible en este momento.",
-          "failed-precondition": "No se cumplen las condiciones necesarias para eliminar la pieza."
+          "permission-denied":
+            "Firebase ha rechazado la operación por permisos.",
+          unauthenticated: "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+          unavailable: "Firebase no está disponible en este momento.",
+          "failed-precondition":
+            "No se cumplen las condiciones necesarias para eliminar la pieza.",
         };
 
         const mensaje =
@@ -355,7 +511,6 @@ function renderProducts(products) {
       }
     });
   });
-
 }
 
 function startEditProduct(p) {
@@ -420,7 +575,10 @@ productForm?.addEventListener("submit", async (e) => {
     let imageDataUrl;
 
     if (file) {
-      imageDataUrl = await compressImageToDataUrl(file, { maxDim: 560, maxBytes: 45 * 1024 });
+      imageDataUrl = await compressImageToDataUrl(file, {
+        maxDim: 560,
+        maxBytes: 45 * 1024,
+      });
     }
 
     if (editingProductId) {
@@ -428,7 +586,10 @@ productForm?.addEventListener("submit", async (e) => {
       if (imageDataUrl) {
         data.imageDataUrl = imageDataUrl;
       }
-      await firestore.updateDoc(firestore.doc(db, "products", editingProductId), data);
+      await firestore.updateDoc(
+        firestore.doc(db, "products", editingProductId),
+        data,
+      );
     } else {
       await firestore.addDoc(firestore.collection(db, "products"), {
         name,
@@ -456,7 +617,10 @@ productForm?.addEventListener("submit", async (e) => {
 
 function watchOrders() {
   const { db, firestore } = fb;
-  const q = firestore.query(firestore.collection(db, "orders"), firestore.orderBy("createdAt", "desc"));
+  const q = firestore.query(
+    firestore.collection(db, "orders"),
+    firestore.orderBy("createdAt", "desc"),
+  );
   unsubOrders = firestore.onSnapshot(q, (snap) => {
     const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     renderWhatsappInquiries(all.filter((o) => Boolean(o.productId)));
@@ -473,7 +637,10 @@ function bindStatusToggle(container) {
     btn.addEventListener("click", async () => {
       const { db, firestore } = fb;
       const next = btn.dataset.status === "atendido" ? "nuevo" : "atendido";
-      await firestore.updateDoc(firestore.doc(db, "orders", btn.dataset.orderToggle), { status: next });
+      await firestore.updateDoc(
+        firestore.doc(db, "orders", btn.dataset.orderToggle),
+        { status: next },
+      );
     });
   });
 }
@@ -527,7 +694,9 @@ function renderCustomOrders(orders) {
 
   orderList.innerHTML = orders
     .map((o) => {
-      const waMsg = encodeURIComponent(`Hola ${o.name}, te escribimos de Ana Otalvaro Joyería sobre tu pedido ✨`);
+      const waMsg = encodeURIComponent(
+        `Hola ${o.name}, te escribimos de Ana Otalvaro Joyería sobre tu pedido ✨`,
+      );
       return `
       <div class="card" style="margin-bottom:14px;">
         <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;">
