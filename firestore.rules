@@ -11,11 +11,28 @@ service cloud.firestore {
     // Las fotos viajan como texto (base64) dentro del campo "imageDataUrl",
     // así que se limita su tamaño para no llenar la base de datos.
     match /products/{productId} {
+      // Cualquier visitante puede consultar el catálogo.
       allow read: if true;
-      allow write: if request.auth != null
-                   && (!('imageDataUrl' in request.resource.data)
-                       || request.resource.data.imageDataUrl == null
-                       || request.resource.data.imageDataUrl.size() < 800000);
+
+      // Solo usuarios autenticados pueden crear productos.
+      allow create: if request.auth != null
+                    && (
+                      !('imageDataUrl' in request.resource.data)
+                      || request.resource.data.imageDataUrl == null
+                      || request.resource.data.imageDataUrl.size() < 800000
+                    );
+
+      // Solo usuarios autenticados pueden editar productos.
+      allow update: if request.auth != null
+                    && (
+                      !('imageDataUrl' in request.resource.data)
+                      || request.resource.data.imageDataUrl == null
+                      || request.resource.data.imageDataUrl.size() < 800000
+                    );
+
+      // Solo usuarios autenticados pueden eliminar productos.
+      // No se consulta request.resource porque no existe al borrar.
+      allow delete: if request.auth != null;
     }
 
     // Encargos: cualquier visitante puede crear uno, de dos formas posibles,

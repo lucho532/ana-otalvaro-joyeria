@@ -217,19 +217,52 @@ function renderProducts(products) {
     });
   });
 
+  
   productList.querySelectorAll("[data-delete]").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      if (!confirm("¿Eliminar esta pieza? Esta acción no se puede deshacer.")) return;
+      if (!confirm("¿Eliminar esta pieza? Esta acción no se puede deshacer.")) {
+        return;
+      }
+
       const p = products.find((x) => x.id === btn.dataset.delete);
+
+      if (!p) {
+        alert("No se encontró la pieza que intentas eliminar.");
+        return;
+      }
+
       const { db, firestore } = fb;
+
+      btn.disabled = true;
+
       try {
-        await firestore.deleteDoc(firestore.doc(db, "products", p.id));
+        await firestore.deleteDoc(
+          firestore.doc(db, "products", p.id)
+        );
+
+        console.info("Producto eliminado correctamente:", p.id);
+        alert("La pieza se ha eliminado correctamente.");
       } catch (err) {
-        console.error(err);
-        alert("No se pudo eliminar la pieza.");
+        console.error("Error al eliminar el producto:", err);
+
+        const mensajes = {
+          "permission-denied": "Firebase ha rechazado la operación por permisos.",
+          "unauthenticated": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+          "unavailable": "Firebase no está disponible en este momento.",
+          "failed-precondition": "No se cumplen las condiciones necesarias para eliminar la pieza."
+        };
+
+        const mensaje =
+          mensajes[err.code] ||
+          `No se pudo eliminar la pieza. Código: ${err.code || "desconocido"}.`;
+
+        alert(mensaje);
+      } finally {
+        btn.disabled = false;
       }
     });
   });
+
 }
 
 function startEditProduct(p) {
