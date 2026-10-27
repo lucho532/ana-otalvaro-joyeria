@@ -46,6 +46,8 @@ const PRODUCT_CATEGORIES = [
 let productCategoryFilter = "todos";
 
 window.addEventListener("popstate", () => {
+  // Si seguimos en la entrada del formulario (p. ej. se cerró la foto), no lo cerramos.
+  if (history.state?.adminEdit) return;
   document.querySelectorAll(".admin-inline-edit").forEach((f) => f.remove());
   document
     .querySelectorAll(".admin-row--editing")
