@@ -58,6 +58,53 @@ async function logCatalogInterest(product) {
   }
 }
 
+// -------------------- Ampliar foto --------------------
+// Reutiliza los estilos de #admin-image-modal (css/styles.css).
+function closeImageModal() {
+  if (history.state?.imageModal) {
+    history.back();
+  } else {
+    const modal = document.getElementById("admin-image-modal");
+    if (modal) modal.hidden = true;
+  }
+}
+
+function openImageModal(product) {
+  let modal = document.getElementById("admin-image-modal");
+
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "admin-image-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="admin-image-modal__content" role="dialog" aria-modal="true" aria-label="Foto del producto">
+        <button type="button" class="admin-image-modal__close" aria-label="Cerrar foto">&times;</button>
+        <img class="admin-image-modal__photo" alt="">
+        <p class="admin-image-modal__caption"></p>
+      </div>`;
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal || event.target.closest(".admin-image-modal__close")) closeImageModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !modal.hidden) closeImageModal();
+    });
+    // El botón "atrás" cierra la foto en vez de salir de la página.
+    window.addEventListener("popstate", () => {
+      modal.hidden = true;
+    });
+  }
+
+  const photo = modal.querySelector(".admin-image-modal__photo");
+  photo.src = product.imageDataUrl;
+  photo.alt = product.name || "";
+  modal.querySelector(".admin-image-modal__caption").textContent = product.name || "";
+
+  if (!history.state?.imageModal) history.pushState({ imageModal: true }, "");
+  modal.hidden = false;
+}
+
 function renderState(message, title) {
   grid.innerHTML = `<div class="state-msg"><strong>${escapeHtml(title)}</strong>${escapeHtml(message)}</div>`;
 }
@@ -77,7 +124,7 @@ function renderProducts() {
         : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(20,158,132,0.35);font-size:2.4rem;">✦</div>`;
       return `
         <article class="product-card" id="producto-${escapeHtml(p.id)}">
-          <div class="product-card__img">
+          <div class="product-card__img"${p.imageDataUrl ? ` data-zoom-product="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="Ampliar foto de ${escapeHtml(p.name)}" style="cursor:zoom-in"` : ""}>
             ${p.category ? `<span class="product-card__badge">${escapeHtml(p.category)}</span>` : ""}
             ${img}
           </div>
@@ -95,6 +142,20 @@ function renderProducts() {
         </article>`;
     })
     .join("");
+
+  grid.querySelectorAll("[data-zoom-product]").forEach((box) => {
+    const abrir = () => {
+      const product = allProducts.find((p) => p.id === box.dataset.zoomProduct);
+      if (product) openImageModal(product);
+    };
+    box.addEventListener("click", abrir);
+    box.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        abrir();
+      }
+    });
+  });
 
   grid.querySelectorAll("[data-product-id]").forEach((link) => {
     link.addEventListener("click", () => {
