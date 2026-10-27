@@ -33,7 +33,24 @@ let editingProductId = null;
 let unsubProducts = null;
 let unsubOrders = null;
 let latestProducts = [];
+const PRODUCT_CATEGORIES = [
+  "Aretes",
+  "Anillos",
+  "Cadenas y Dijes",
+  "Pulseras",
+  "Manillas",
+  "Personalizados",
+  "Animales",
+  "Otro",
+];
 let productCategoryFilter = "todos";
+
+window.addEventListener("popstate", () => {
+  document.querySelectorAll(".admin-inline-edit").forEach((f) => f.remove());
+  document
+    .querySelectorAll(".admin-row--editing")
+    .forEach((r) => r.classList.remove("admin-row--editing"));
+});
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -229,6 +246,18 @@ function renderProducts(products) {
     )
     .join("");
 
+  const cerrarModalImagen = () => {
+    if (history.state?.adminImage) {
+      history.back();
+    } else {
+      const m = document.getElementById("admin-image-modal");
+      if (m) {
+        m.hidden = true;
+        m.style.display = "none";
+      }
+    }
+  };
+
   // Ampliar fotografías al hacer clic o pulsar Enter/Espacio.
   productList.querySelectorAll("[data-preview-image]").forEach((img) => {
     const abrirImagen = () => {
@@ -276,16 +305,20 @@ function renderProducts(products) {
           const botonCerrar = event.target.closest(".admin-image-modal__close");
 
           if (event.target === modal || botonCerrar) {
-            modal.hidden = true;
-            modal.style.display = "none";
+            cerrarModalImagen();
           }
         });
 
         document.addEventListener("keydown", (event) => {
           if (event.key === "Escape" && !modal.hidden) {
-            modal.hidden = true;
-            modal.style.display = "none";
+            cerrarModalImagen();
           }
+        });
+
+        // El botón "atrás" del navegador cierra la foto en vez de salir de la página.
+        window.addEventListener("popstate", () => {
+          modal.hidden = true;
+          modal.style.display = "none";
         });
       }
 
@@ -295,6 +328,9 @@ function renderProducts(products) {
       modal.querySelector(".admin-image-modal__caption").textContent =
         producto.name || "Fotografía del producto";
 
+      if (!history.state?.adminImage) {
+        history.pushState({ adminImage: true }, "");
+      }
       modal.hidden = false;
       modal.style.display = "flex";
     };
@@ -334,6 +370,11 @@ function renderProducts(products) {
 
       tarjeta.classList.add("admin-row--editing");
 
+      // "Atrás" del navegador cierra el formulario en vez de salir de la página.
+      if (!history.state?.adminEdit) {
+        history.pushState({ adminEdit: true }, "");
+      }
+
       const formulario = document.createElement("form");
       formulario.className = "admin-inline-edit";
 
@@ -348,7 +389,10 @@ function renderProducts(products) {
   <label>
     Categoría
     <select name="category" required>
-      ${["Aretes", "Anillos", "Collares", "Pulseras", "Dijes", "Otros"]
+      ${(PRODUCT_CATEGORIES.includes(p.category) || !p.category
+        ? PRODUCT_CATEGORIES
+        : [p.category, ...PRODUCT_CATEGORIES]
+      )
         .map(
           (categoria) => `
           <option value="${categoria}" ${p.category === categoria ? "selected" : ""}>
@@ -447,8 +491,12 @@ function renderProducts(products) {
       formulario
         .querySelector("[data-cancel-inline]")
         .addEventListener("click", () => {
-          formulario.remove();
-          tarjeta.classList.remove("admin-row--editing");
+          if (history.state?.adminEdit) {
+            history.back();
+          } else {
+            formulario.remove();
+            tarjeta.classList.remove("admin-row--editing");
+          }
         });
 
       formulario.scrollIntoView({ behavior: "smooth", block: "nearest" });
